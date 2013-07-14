@@ -162,6 +162,46 @@ describe("app: ", function() {
 
     }); // different module directive
 
+    describe("stub different module directive: ", function() {
+      var element, ModuleOneCtrl;
+
+      beforeEach( function() {
+        angular.module('stub_controllers', [])
+          .controller('ModuleOneCtrl', ['$scope', function($scope) {
+            $scope.value = "stubbed-controller-value";
+          }]);
+        module('stub_controllers');
+        module('directives');
+        inject(function(_$rootScope_, _$compile_) {
+          $scope = _$rootScope_.$new(); // inject the testing singleton
+          $compile = _$compile_
+        });
+      });
+
+      beforeEach(function() {
+        // wrap directive in div and use fully qualified html
+        element = angular.element("<div><different-module-directive></different-module-directive></div>");
+        var linkFunction = $compile(element); // compile html
+        linkFunction($scope); // link to scope
+        $scope.$apply(); // run the scope
+      });
+
+      it("loads from template", function() {
+        var el = element.find('div')[0];
+        var name = el.attributes['name'].value;
+        expect(el).toBeDefined();
+        expect(name).toBe('template-element');
+      });
+
+      it("loads value from controller scope", function() {
+        var el = element.find('div')[0];
+        var name = el.attributes['name'].value;
+        expect(el).toBeDefined();
+        expect(name).toBe('template-element');
+        expect(el.textContent).toBe('stubbed-controller-value');
+      });
+
+    }); // stub different module directive
 
   }); // directive
 
